@@ -33,7 +33,7 @@ public class Board {
     // if return false, can't place piece
     public boolean canPlacePiece(int column) {
         column--; // For 0-based indexing
-        if (column >= NUM_OF_COLUMNS)
+        if (column >= NUM_OF_COLUMNS || column < 0)
             return false;
         return this.board.get(column).get(NUM_OF_ROWS - 1) == 0;
     }
@@ -46,6 +46,14 @@ public class Board {
             return winner;
 
         winner = getWinnerColumns();
+        if (winner != 0)
+            return winner;
+
+        winner = getWinnerDiagonalsDown();
+        if (winner != 0)
+            return winner;
+
+        winner = getWinnerDiagonalsUp();
         if (winner != 0)
             return winner;
 
@@ -104,8 +112,113 @@ public class Board {
         return 0;
     }
 
-    private int getWinnerDiagonals() {
-        return 0; // TODO: this
+    private int getWinnerDiagonalsDown() {
+        int currentVal = 0;
+        int count;
+        int currentRow;
+        int currentCol;
+        int currentCell;
+        // Start at 0,0
+        for (int startRow = 0; startRow < NUM_OF_ROWS; startRow++) {
+            currentRow = startRow;
+            currentCol = 0;
+            count = 0;
+            while (isValidCell(currentRow, currentCol)) {
+                currentCell = this.board.get(currentCol).get(currentRow);
+                if (currentVal != currentCell || currentCell == 0) {
+                    count = 0;
+                    currentVal = currentCell;
+                }
+
+                count++;
+                if (count >= 4) {
+                    return currentCell;
+                }
+
+                currentCol++;
+                currentRow--;
+            }
+        }
+
+        for (int startCol = 0; startCol < NUM_OF_ROWS; startCol++) {
+            currentCol = startCol;
+            currentRow = NUM_OF_ROWS - 1;
+            count = 0;
+            while (isValidCell(currentRow, currentCol)) {
+                currentCell = this.board.get(currentCol).get(currentRow);
+                if (currentVal != currentCell || currentCell == 0) {
+                    count = 0;
+                    currentVal = currentCell;
+                }
+
+                count++;
+                if (count >= 4) {
+                    return currentCell;
+                }
+
+                currentCol++;
+                currentRow--;
+            }
+        }
+
+
+        return 0;
+    }
+
+    private int getWinnerDiagonalsUp() {
+        int currentVal = 0;
+        int count;
+        int currentRow;
+        int currentCol;
+        int currentCell;
+        for (int startRow = NUM_OF_ROWS - 1; startRow >= 0; startRow--) {
+            currentRow = startRow;
+            currentCol = 0;
+            count = 0;
+            while (isValidCell(currentRow, currentCol)) {
+                currentCell = this.board.get(currentCol).get(currentRow);
+                if (currentVal != currentCell || currentCell == 0) {
+                    count = 0;
+                    currentVal = currentCell;
+                }
+
+                count++;
+                if (count >= 4) {
+                    return currentCell;
+                }
+
+                currentCol++;
+                currentRow++;
+            }
+        }
+
+        for (int startCol = 0; startCol < NUM_OF_ROWS; startCol++) {
+            currentCol = startCol;
+            currentRow = 0;
+            count = 0;
+            while (isValidCell(currentRow, currentCol)) {
+                currentCell = this.board.get(currentCol).get(currentRow);
+                if (currentVal != currentCell || currentCell == 0) {
+                    count = 0;
+                    currentVal = currentCell;
+                }
+
+                count++;
+                if (count >= 4) {
+                    return currentCell;
+                }
+
+                currentCol++;
+                currentRow++;
+            }
+        }
+
+
+        return 0;
+    }
+
+    private boolean isValidCell(int row, int col) {
+        return (0 <= row && row < NUM_OF_ROWS) && (0 <= col && col < NUM_OF_COLUMNS);
     }
 
     public String toString() {

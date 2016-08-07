@@ -44,7 +44,7 @@ public class TwilioServlet extends HttpServlet {
         String toNumber = request.getParameter("To");
         String body = request.getParameter("Body");
 
-        if (body.toLowerCase().equals("help")) {
+        if (body.equals("?")) {
             sendMessage(toNumber, fromNumber,
                     "Connect4SMS Help: Send 'join' to enter a game. Once you enter a game, send a column number to place a piece in that column. Get 4 in a row vertically, horizontally, or diagonally to win.");
         }
@@ -62,7 +62,8 @@ public class TwilioServlet extends HttpServlet {
                         message = "You are already waiting to join a game. Please be patient :)";
                     } else {
                         this.games.add(new Game(this.waitingPlayer, fromNumber));
-                        message = "You have successfully joined a game! ^_^ When it's your turn, send a column number to place a piece. Board:";
+                        message = "You have successfully joined a game! ^_^ When it's your turn, send a column number to place a piece.";
+                                //+ " Board:\n" + game.board.toString();
                         sendMessage(toNumber, this.waitingPlayer, message + "\nIt's your turn, Player 1!");
                         sendMessage(toNumber, fromNumber, message + "\nIt's not your turn, Player 2 :(");
                         this.waitingPlayer = null;
@@ -70,7 +71,7 @@ public class TwilioServlet extends HttpServlet {
                     }
                 }
             } else {
-                message = "You aren't in a game yet silly! Send 'join' to enter a game.";
+                message = "You aren't in a game yet silly! Send 'join' to enter a game or send '?' for help";
             }
         } else {
             // if fromNumber is current player's turn, check if they sent an int
@@ -81,25 +82,29 @@ public class TwilioServlet extends HttpServlet {
                         game.board.placePiece(game.currentTurn, column);
                         int winner = game.board.getWinner();
                         if (winner == 0) {
+                            message = "\nPlayer " + (game.currentTurn + 1) + " placed a piece in column " + column;
                             game.currentTurn = (game.currentTurn + 1) % 2;
-                            message = "Current board:\n";
+
+                            message += "\nCurrent board:\n";
                             message += game.board.toString();
                             // send to other person too
                             sendMessage(toNumber, game.players.get(game.currentTurn), message + "\nIt's your turn!");
                         } else { // game over
-                            message = "Game over! Player " + (game.currentTurn + 1) + " wins!";
+                            message = "Current board:\n" + game.board.toString() + "Game over! Player " + (game.currentTurn + 1) + " wins!";
                             // send to other person too
                             sendMessage(toNumber, game.players.get(game.currentTurn), message);
+                            sendMessage(toNumber, game.players.get((game.currentTurn + 1) % 2), message);
                             this.games.remove(game);
+                            return;
                         }
                     } else {
-                        message = "Invalid move. Please send a valid column number.";
+                        message = "Invalid move. Please send a valid column number. Send '?' for help.";
                     }
                 } catch(Exception e) { // if no int was sent/ not valid int, reply with invalid message.
-                    message = "Invalid command. Please send a valid column number.";
+                    message = "Invalid command. Please send a valid column number. Send '?' for help";
                 }
             } else { // if fromNumber != current player's turn, reply with "it's not ur turn"
-                message = "It's not your turn.";
+                message = "It's not your turn. Send '?' for help.";
             }
 
 
