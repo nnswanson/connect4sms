@@ -96,6 +96,8 @@ public class Board {
     }
 
     public String toString() {
-        return "";
+        String s = "";
+
+        return s;
     }
 }
