@@ -74,7 +74,7 @@ public class Board {
     }
 
     private int getWinnerDiagonals() {
-
+        return 0; // TODO: this
     }
 
     private boolean checkWinner(int count, int currentValue, int colNum, int rowNum) {
@@ -96,6 +96,6 @@ public class Board {
     }
 
     public String toString() {
-
+        return "";
     }
 }
