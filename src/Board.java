@@ -23,6 +23,7 @@ public class Board {
     public void placePiece(int player, int column) {
         int row = 0;
         player++;
+        column--;
         while(this.board.get(column).get(row) != 0) {
             row++;
         }
@@ -31,6 +32,9 @@ public class Board {
 
     // if return false, can't place piece
     public boolean canPlacePiece(int column) {
+        column--; // For 0-based indexing
+        if (column >= NUM_OF_COLUMNS)
+            return false;
         return this.board.get(column).get(NUM_OF_ROWS - 1) == 0;
     }
 

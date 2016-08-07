@@ -44,6 +44,11 @@ public class TwilioServlet extends HttpServlet {
         String toNumber = request.getParameter("To");
         String body = request.getParameter("Body");
 
+        if (body.toLowerCase().equals("help")) {
+            sendMessage(toNumber, fromNumber,
+                    "Connect4SMS Help: Send 'join' to enter a game. Once you enter a game, send a column number to place a piece in that column. Get 4 in a row vertically, horizontally, or diagonally to win.");
+        }
+
         Game game = getGame(fromNumber);
         String message = "";
         if (game == null) {
@@ -57,10 +62,11 @@ public class TwilioServlet extends HttpServlet {
                         message = "You are already waiting to join a game. Please be patient :)";
                     } else {
                         this.games.add(new Game(this.waitingPlayer, fromNumber));
+                        message = "You have successfully joined a game! ^_^ When it's your turn, send a column number to place a piece. Board:";
+                        sendMessage(toNumber, this.waitingPlayer, message + "\nIt's your turn, Player 1!");
+                        sendMessage(toNumber, fromNumber, message + "\nIt's not your turn, Player 2 :(");
                         this.waitingPlayer = null;
-                        message = "You have successfully joined a game! ^_^ When it's your turn, send a column number to place a piece.";
-                        sendMessage(toNumber, game.players.get(game.currentTurn), message + "\nIt's your turn!");
-                        sendMessage(toNumber, game.players.get((game.currentTurn + 1) % 2), message);
+                        return;
                     }
                 }
             } else {
@@ -82,6 +88,8 @@ public class TwilioServlet extends HttpServlet {
                             sendMessage(toNumber, game.players.get(game.currentTurn), message + "\nIt's your turn!");
                         } else { // game over
                             message = "Game over! Player " + (game.currentTurn + 1) + " wins!";
+                            // send to other person too
+                            sendMessage(toNumber, game.players.get(game.currentTurn), message);
                             this.games.remove(game);
                         }
                     } else {
@@ -103,7 +111,7 @@ public class TwilioServlet extends HttpServlet {
     public void sendMessage(String fromNumber, String toNumber, String body) {
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
 
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("To", toNumber));
         params.add(new BasicNameValuePair("From", fromNumber));
         params.add(new BasicNameValuePair("Body", body));
@@ -111,6 +119,7 @@ public class TwilioServlet extends HttpServlet {
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
         try {
             Message message = messageFactory.create(params);
+            System.out.println(message.getSid());
         } catch (TwilioRestException e) {
             System.out.println(e.getErrorMessage());
         }
