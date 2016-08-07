@@ -50,11 +50,24 @@ public class Board {
     private int getWinnerRows() {
         int count;
         int currentValue = 0;
+        int currentCell;
         for (int rowNum = 0; rowNum < NUM_OF_ROWS; rowNum++) {
             count = 0;
             for (int colNum = 0; colNum < NUM_OF_COLUMNS; colNum++) {
-                if (checkWinner(count, currentValue, colNum, rowNum))
-                    return currentValue;
+                currentCell = this.board.get(colNum).get(rowNum);
+                if (currentCell == 0) {
+                    currentValue = 0;
+                    count = 0;
+                } else {
+                    if (currentValue != currentCell) {
+                        currentValue = currentCell;
+                        count = 0;
+                    }
+                    count++;
+                    if (count >= 4) {
+                        return currentCell;
+                    }
+                }
             }
         }
         return 0;
@@ -63,11 +76,24 @@ public class Board {
     private int getWinnerColumns() {
         int count;
         int currentValue = 0;
+        int currentCell;
         for (int colNum = 0; colNum < NUM_OF_COLUMNS; colNum++) {
             count = 0;
             for (int rowNum = 0; rowNum < NUM_OF_ROWS; rowNum++) {
-                if (checkWinner(count, currentValue, colNum, rowNum))
-                    return currentValue;
+                currentCell = this.board.get(colNum).get(rowNum);
+                if (currentCell == 0) {
+                    currentValue = 0;
+                    count = 0;
+                } else {
+                    if (currentValue != currentCell) {
+                        currentValue = currentCell;
+                        count = 0;
+                    }
+                    count++;
+                    if (count >= 4) {
+                        return currentCell;
+                    }
+                }
             }
         }
         return 0;
@@ -77,26 +103,14 @@ public class Board {
         return 0; // TODO: this
     }
 
-    private boolean checkWinner(int count, int currentValue, int colNum, int rowNum) {
-        int currentCell = this.board.get(colNum).get(rowNum);
-        if (currentCell == 0) {
-            currentValue = 0;
-            count = 0;
-        } else {
-            if (currentValue != currentCell) {
-                currentValue = currentCell;
-                count = 0;
-            }
-            count++;
-            if (count >= 4) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public String toString() {
         String s = "";
+        for (int row = NUM_OF_ROWS - 1; row >= 0; row--) {
+            for (int col = 0; col < NUM_OF_COLUMNS; col++) {
+                s += this.board.get(col).get(row) + " ";
+            }
+            s += "\n";
+        }
 
         return s;
     }
