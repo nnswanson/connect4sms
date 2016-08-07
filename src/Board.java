@@ -22,6 +22,7 @@ public class Board {
 
     public void placePiece(int player, int column) {
         int row = 0;
+        player++;
         while(this.board.get(column).get(row) != 0) {
             row++;
         }
